@@ -1,0 +1,14 @@
+firebase_admin==6.6.0
+Flask==3.1.0
+matplotlib==3.7.1
+opencv_contrib_python==4.7.0.68
+opencv_python==4.10.0.84
+opencv_python_headless==4.11.0.86
+# picamera2==0.3.27
+Pillow==10.4.0
+python-dotenv==1.1.0
+Requests==2.32.3
+seaborn==0.13.2
+torch==2.7.1
+torchvision==0.22.1
+numpy==1.26.4
