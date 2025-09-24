@@ -77,16 +77,16 @@ def register_or_login(email, password, isRegistering=False):
 
 
 # Function to place files into Firebase Storage
-def place_file_into_storage(folder_path, filename, file):
-    blob_path = f'{folder_path}/{filename}'  # Path in Firebase storage
+def place_file_into_storage(file_path, file):
+    blob_path = f'{file_path}'  # Path in Firebase storage
     blob = bucket.blob(blob_path)  # Create blob reference
     
     blob.upload_from_file(file)  # Upload file
     print(f"File {filename} successfully uploaded to {blob_path}")
 
 # Function to grab files out of Firebase Storage
-def grab_file_from_storage(folder_path, file_name):
-    blob_path = f'{folder_path}/{file_name}'  # Path of the file in storage
+def grab_file_from_storage(file_path):
+    blob_path = f'{file_path}'  # Path of the file in storage
     blob = bucket.blob(blob_path)  # Get blob reference
 
     if blob.exists():  # Check if the blob exists in Firebase storage
@@ -101,6 +101,20 @@ def get_files_in_storage(folder_path):
     blob_path = f'{folder_path}/'
     blobs = bucket.list_blobs(prefix=blob_path)
     return [blob.name for blob in blobs]
+
+# Function to generate a signed url for a file already in storage, returns url
+def generate_signed_url(blob_path, days):
+    try:
+        # Reference the blob in Firebase Storage
+        blob = bucket.blob(blob_path)
+
+        # Generate a signed URL valid
+        expiration_time = datetime.timedelta(days=days)
+        signed_url = blob.generate_signed_url(expiration=expiration_time)
+        return signed_url
+    except Exception as error:
+        print(f"Error generating signed url for blob path: {blob_path}")
+        return None
 
 if __name__ == "__main__":
     # collection_name = "users"

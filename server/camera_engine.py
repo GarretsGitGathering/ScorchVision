@@ -72,10 +72,12 @@ def update_fire(isFire):
         # print(f"Data to post: {data}")
         
         # perfrom an http post request
+        files = {'image': open('capture/cap.png', 'rb')}
         response = requests.post(
             "http://192.168.0.103:5000/update_fire",
             headers={"Content-Type": "application/json"},
-            json = data
+            json=data,
+            files=files
         )
         # print(f"Response Data: {response.json()}")
         

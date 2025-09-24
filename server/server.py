@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from main import generate_heatmap       # import function to generate heatmaps for machine learning model
 from fire_ml import load_model, predict # import functions to load up saved model and predict 
-from firebase_options import register_or_login, update_document, get_document  # import the firebase functions
+from firebase_options import register_or_login, update_document, get_document, place_file_into_storage, grab_file_from_storage, generate_signed_url  # import the firebase functions
 import uuid # creating the unique keys
 
 # create the flask server object
@@ -95,9 +95,12 @@ def check_fire():
                 
                 # set the new key into the database
                 update_document("fire_cameras", camera_id, "key", new_key)
+
+                # generate a signed url for the image 
+                signed_url = generate_signed_url(f"fire_camera/{user_id}/image.png", 1)
                 
                 # return the status and the updated key
-                return jsonify({"isFire": doc["isFire"], "isGas": doc["isGas"], "key": new_key})
+                return jsonify({"isFire": doc["isFire"], "isGas": doc["isGas"], "key": new_key, "image_url": signed_url})
             else:
                 # handle if there is a key present in the database
                 return jsonify({"error": "Missing key."}), 404
@@ -105,7 +108,10 @@ def check_fire():
             # handle if the key is present
             # check to see if the key matches
             if doc["key"] == key:
-                return jsonify({"isFire": doc["isFire"], "isGas": doc["isGas"]})
+                # generate a signed url for the image 
+                signed_url = generate_signed_url(f"fire_camera/{user_id}/image.png", 1)
+
+                return jsonify({"isFire": doc["isFire"], "isGas": doc["isGas"], "image_url": signed_url})
             else:
                 # handle if the key doesn't match
                 return jsonify({"error": "Incorrect key."}), 404
@@ -122,6 +128,9 @@ def update_fire():
         camera_key = request.json.get("camera_key")
         fire_status = request.json.get("isFire")
         gas_status = request.json.get("isGas")
+
+        # TODO: fully implement managing image file 
+        image = request.files.get("image", None)
         
         # print(f"Camera_id: {camera_id}\nCamera_key: {camera_key}\nFire_status: {fire_status}")
         
@@ -141,6 +150,12 @@ def update_fire():
                 update_document("fire_cameras", camera_id, "camera_key", new_key)
                 update_document("fire_cameras", camera_id, "isFire", fire_status)
                 update_document("fire_cameras", camera_id, "isGas", gas_status)
+
+                # place image in storage if sent over 
+                if image:
+                    image_path = f"fire_camera/{camera_id}/image.png"
+                    place_file_into_storage(image_path, file)
+                    update_document("fire_cameras", camera_id, "image_path", image_path)
                 
                 # return the status 
                 return jsonify({"status": "success", "key": new_key}) 
