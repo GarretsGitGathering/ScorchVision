@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rain_project/constants.dart';
+import 'package:rain_project/device_settings.dart';
 import 'package:rain_project/profile_settings.dart';
 import 'package:rain_project/splashscreen.dart';
 import 'package:http/http.dart' as http;
@@ -211,7 +212,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     title: "Device Settings",
                     subtitle: "Configure camera preferences",
                     onTap: () {
-                      // TODO: Navigate to device settings
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => DeviceSettings()));
                     },
                   ),
                 ],

@@ -41,7 +41,8 @@ class _homepageState extends State<homepage> {
       var body = jsonDecode(response.body);
       var isFire = body['isFire'];
       var isGas = body['isGas'];
-      var imageUrl = body['image_url'];
+      var imageUrl = body['image_path'];
+      print("Response Body: $body");
 
       if (isFire == null || isGas == null) {
         PopupAlert(
@@ -52,7 +53,7 @@ class _homepageState extends State<homepage> {
         return;
       }
 
-      if (isFire) {
+      if (isFire == "True") {
         _isFire = true;
         PopupAlert(
           "Fire Detected",
@@ -61,7 +62,7 @@ class _homepageState extends State<homepage> {
         );
       }
 
-      if (isGas) {
+      if (isGas == "True") {
         PopupAlert(
           "Gas Detected",
           "Gas readings have been detected. It is best for you to check to ensure your house's safety.",
@@ -71,7 +72,8 @@ class _homepageState extends State<homepage> {
 
       // explicitly set the state for the image to appear
       setState((){
-         _imageUrl = imageUrl; 
+         _imageUrl = imageUrl;
+         print("Setting imageurl: $imageUrl");
       });
     } else {
       PopupAlert(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-String apiUrl = "https://fire-detection-backend-0wpb.onrender.com";
+String apiUrl = "https://rain-fire-detection.onrender.com";
 
 String? user_id;  // will be populated when user signs for first time
 String? id_token;
