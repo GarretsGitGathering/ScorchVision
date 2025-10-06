@@ -97,10 +97,10 @@ def check_fire():
                 update_document("fire_cameras", camera_id, "key", new_key)
 
                 # generate a signed url for the image 
-                signed_url = generate_signed_url(f"fire_camera/{user_id}/image.png", 1)
+                signed_url = generate_signed_url(f"fire_camera/{camera_id}/image.png", 1)
                 
                 # return the status and the updated key
-                return jsonify({"isFire": doc["isFire"], "isGas": doc["isGas"], "key": new_key, "image_url": signed_url})
+                return jsonify({"isFire": doc["isFire"], "isGas": doc["isGas"], "key": new_key, "image_path": signed_url})
             else:
                 # handle if there is a key present in the database
                 return jsonify({"error": "Missing key."}), 404
@@ -109,9 +109,9 @@ def check_fire():
             # check to see if the key matches
             if doc["key"] == key:
                 # generate a signed url for the image 
-                signed_url = generate_signed_url(f"fire_camera/{user_id}/image.png", 1)
+                signed_url = generate_signed_url(f"fire_camera/{camera_id}/image.png", 1)
 
-                return jsonify({"isFire": doc["isFire"], "isGas": doc["isGas"], "image_url": signed_url})
+                return jsonify({"isFire": doc["isFire"], "isGas": doc["isGas"], "image_path": signed_url})
             else:
                 # handle if the key doesn't match
                 return jsonify({"error": "Incorrect key."}), 404
