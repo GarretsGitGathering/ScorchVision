@@ -19,7 +19,8 @@ class _DeviceSettingsState extends State<DeviceSettings> {
       Uri.parse("$apiUrl/shutdown"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
-        "key": await getString("key")
+        "key": await getString("key"),
+        "camera_id": await getString("camera_id")
       })
     );
 

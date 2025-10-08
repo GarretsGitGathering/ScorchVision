@@ -158,7 +158,7 @@ def update_fire():
                     update_document("fire_cameras", camera_id, "image_path", image_path)
                 
                 # return the status 
-                return jsonify({"status": "success", "key": new_key}) 
+                return jsonify({"status": "success", "key": new_key, "shut_off": doc.get("shut_off", False)}) 
             else:
                 return jsonify({"error": "Missing key."}), 404
         else:
@@ -166,12 +166,39 @@ def update_fire():
             if camera_key == doc["camera_key"]:
                 update_document("fire_cameras", camera_id, "isFire", fire_status)
                 update_document("fire_cameras", camera_id, "isGas", gas_status)
-                return jsonify({"status": "success"}) 
+                return jsonify({"status": "success", "shut_off": doc.get("shut_off", False)}) 
             else:
                 return jsonify({"error": "Incorrect key."}), 404
         
     except Exception as error:
         return jsonify({"error": f"Error updating: {error}"}), 404
+
+
+# route to send signal shutdown request for hardware 
+@server.route("/shutdown", methods=['POST'])
+def shutdown():
+    try:
+        camera_id = request.json.get("camera_id", None)
+        key = request.json.get("key", None)
+        if not any([camera_id, key]):
+            return jsonify({"error": "Missing camera id or key."}), 404
+
+        # grab the real key and ensure keys match 
+        data = get_document("fire_cameras", camera_id)
+        if not data:
+            return jsonify({"error": "Not a real camera."}), 404
+
+        real_key = data.get("key", None)
+        if not real_key:
+            return jsonify({"error": "Not permitted to shut down device without being paired."}), 404
+
+        if (real_key == key):
+            update_document("fire_cameras", camera_id, "shut_off", True)
+            return jsonify({"status": "Successfully initiated shutdown."})
+
+        return jsonify({"error": "Unable to shutdown camera. Your key is incorrect."}). 404
+    except Exception as error:
+        return jsonify({"error": f"Error shutting down: {error}"}), 500
 
 if __name__ == "__main__":
     server.run(host='0.0.0.0', port=5000)# route for the user to sign up

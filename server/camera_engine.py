@@ -58,6 +58,10 @@ def update_env(env_key, value, env_file='.env'):
     with open(env_file, 'w') as file:
         file.writelines(lines)
 
+# function to shut off the raspberry pi 
+def shut_down():
+    os.system("sudo shutdown -h now")
+
 # update firebase by requesting to /update_fire in server to update the fire status
 def update_fire(isFire):
     global key
@@ -74,7 +78,7 @@ def update_fire(isFire):
         # perfrom an http post request
         files = {'image': open('capture/cap.png', 'rb')}
         response = requests.post(
-            "http://192.168.0.103:5000/update_fire",
+            "https://rain-fire-detection.onrender.com/update_fire",
             headers={"Content-Type": "application/json"},
             json=data,
             files=files
@@ -93,6 +97,12 @@ def update_fire(isFire):
                 update_env("KEY", new_key)
                 key = new_key
                 print(f"Saved new key: {new_key}")
+
+            # check if shoud shutdown, then do so 
+            shut_off = body.get("shut_off", False)
+            if shut_off:
+                shut_down()
+
             return True
         else:
             print(f"Issue posting data: {response.reason} {response.status_code}")
